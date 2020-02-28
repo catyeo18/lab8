@@ -116,17 +116,19 @@ module MakeStack (Element: SERIALIZE) : (STACK with type element = Element.t) =
     let pop (s : stack) : stack =
       snd (pop_helper s)
 
-    let map (f : element -> element) (s : stack) : stack =
-      List.map f s
+    let map : (element -> element) -> stack -> stack =
+      List.map
 
-    let filter (f : element -> bool) (s : stack) : stack =
-      List.filter f s
+    let filter : (element -> bool) -> stack -> stack =
+      List.filter
 
-    let fold_left (f : 'a -> element -> 'a) (init : 'a) (s : stack) : 'a =
-      List.fold_left f init s
+    let fold_left : ('a -> element -> 'a) -> 'a -> stack -> 'a =
+      List.fold_left
 
-    let rec serialize (s : stack) : string =
-      fold_left (fun x y -> x ^ ":" ^ Element.serialize y) "" s
+    let serialize (s : stack) : string =
+      let string_join x y = Element.serialize y
+                  ^ (if x <> "" then ":" ^ x else "") in
+      fold_left string_join "" s
       
   end ;;
 
@@ -140,6 +142,16 @@ module IntStack = MakeStack
   type t = int
   let serialize = string_of_int
   end) ;;
+
+(* Alternatively: *)
+(* module IntSerialize : (SERIALIZE with type t = int) =
+  struct
+    type t = int
+    let serialize = string_of_int
+  end ;;
+
+module IntStack : (STACK with type element = IntSerialize.t) =
+  MakeStack(IntSerialize) ;; *)
 
 (*......................................................................
 Exercise 1C: Make a module `IntStringStack` that creates a stack whose
@@ -160,9 +172,7 @@ the string will be made up of alphanumeric characters only.
 module IntStringStack = MakeStack 
 (struct 
   type t = (int * string)
-  let serialize (x: t) : string = 
-    match x with 
-    | (a, b) -> "(" ^ string_of_int a ^ ", " ^ b ^ "):"
+  let serialize (n, s) = "(" ^ string_of_int n ^ ",'" ^ s ^ "')"
   end) ;;
 
 

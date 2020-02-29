@@ -102,7 +102,9 @@ module MakeInterval (Endpoint : ORDERED_TYPE) =
     (* is_empty intvl -- Returns true if and only if `intvl` is
        empty *)
     let is_empty (intvl : interval) : bool =
-       intvl = Empty 
+      match intvl with
+      | Empty -> true
+      | Interval _ -> false
 
     (* contains intvl x -- Returns true if and only if the value `x`
        is contained within `intvl` *)

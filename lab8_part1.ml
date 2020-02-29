@@ -365,4 +365,9 @@ instead?
     IntBestInterval.is_empty (IntBestInterval.Interval (4, 3)) ;;
 ......................................................................*)
 
-module IntBestInterval = struct end ;;
+module IntBestInterval =
+  MakeBestInterval
+    (struct 
+      type t = int 
+      let compare = Stdlib.compare
+    end) ;;
